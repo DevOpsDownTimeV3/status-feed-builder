@@ -1,0 +1,8 @@
+name: Metrics Collector
+slug: metrics-collector
+endpoint: https://metrics.internal.ddt-lab.io
+region: ap-south-1
+owner: observability-team
+tags:
+  - monitoring
+  - telemetry

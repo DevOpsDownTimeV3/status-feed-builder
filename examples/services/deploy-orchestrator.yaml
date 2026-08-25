@@ -1,0 +1,9 @@
+name: Deploy Orchestrator
+slug: deploy-orchestrator
+endpoint: https://deploy.internal.ddt-lab.io
+region: ap-south-1
+owner: release-engineering
+tags:
+  - deployment
+  - orchestration
+  - critical

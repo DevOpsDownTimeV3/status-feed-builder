@@ -1,0 +1,9 @@
+name: Auth Gateway
+slug: auth-gateway
+endpoint: https://auth.internal.ddt-lab.io
+region: ap-south-1
+owner: platform-team
+tags:
+  - auth
+  - critical
+  - api-gateway
