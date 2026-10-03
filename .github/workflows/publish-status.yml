@@ -1,0 +1,43 @@
+name: Publish Status Feed
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: publish-status-${{ github.event.workflow_run.id }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check out trusted publisher
+        uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+      - name: Download preview bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-bundle
+          path: artifact/preview-bundle
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+      - name: Install publisher dependencies
+        run: npm ci --ignore-scripts
+      - name: Synchronize dashboard feed
+        env:
+          DASHBOARD_SYNC_TOKEN: ${{ secrets.DASHBOARD_SYNC_TOKEN }}
+        run: node scripts/publish-status.mjs artifact/preview-bundle
