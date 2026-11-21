@@ -1,27 +1,22 @@
 const token = process.env.DASHBOARD_SYNC_TOKEN;
 
-async function check(path) {
-  const response = await fetch(`https://api.github.com${path}`, {
+const response = await fetch(
+  "https://api.github.com/repos/DevOpsDownTimeV3/changelog-generator/contents",
+  {
     headers: {
       Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28"
+      Accept: "application/vnd.github+json"
     }
-  });
+  }
+);
 
-  const data = await response.json();
+const data = await response.json();
 
-  console.log("API_CHECK:", JSON.stringify({
-    path,
-    status: response.status,
-    result: Array.isArray(data)
-      ? data.map(repo => repo.full_name)
-      : data.full_name ?? data.message
-  }));
-}
-
-await check("/repos/DevOpsDownTimeV3/ops-dashboard-internal");
-await check("/user/repos?visibility=all&affiliation=owner,collaborator,organization_member&per_page=100");
+console.log("CHANGELOG_CONTENTS:", JSON.stringify(
+  Array.isArray(data)
+    ? data.map(item => ({ name: item.name, type: item.type, path: item.path }))
+    : data
+));
 
 export async function render(context) {
   return JSON.stringify({
