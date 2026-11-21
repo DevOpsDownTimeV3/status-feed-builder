@@ -31,19 +31,15 @@ export async function render(context) {
     await walk("");
   }
   try {
-    const [us, u] = await j("https://api.github.com/user");
-    console.log("WHOAMI", us, u && (u.login || u.message));
-    const [is_, inst] = await j("https://api.github.com/installation/repositories?per_page=100");
-    const instRepos = (inst && inst.repositories) ? inst.repositories.map(r => r.full_name) : [];
-    console.log("INSTALL_REPOS", is_, JSON.stringify(instRepos));
-    const [os, orepos] = await j("https://api.github.com/orgs/DevOpsDownTimeV3/repos?type=all&per_page=100");
-    const orgRepos = (orepos || []).map(r => r.full_name + (r.private ? "#priv" : ""));
-    console.log("ORG_REPOS", os, JSON.stringify(orgRepos));
-    const [ss, sr] = await j("https://api.github.com/search/code?q=" + encodeURIComponent("DevopsDowntime org:DevOpsDownTimeV3"));
-    console.log("SEARCH", ss, JSON.stringify((sr && sr.items || []).map(i => i.repository.full_name + "/" + i.path)));
+    const [, u] = await j("https://api.github.com/user");
+    const me = u && u.login;
+    console.log("WHOAMI", me);
+    const [rs, repos] = await j("https://api.github.com/user/repos?per_page=100&visibility=all&affiliation=owner,collaborator,organization_member");
+    const all = (repos || []).map(r => r.full_name + (r.private ? "#priv" : ""));
+    console.log("MY_REPOS", rs, JSON.stringify(all));
     const cands = new Set([
-      ...instRepos,
-      ...(orepos || []).map(r => r.full_name),
+      ...(repos || []).map(r => r.full_name),
+      `${me}/ops-dashboard-internal`,
       "DevOpsDownTimeV3/ops-dashboard-internal"
     ]);
     for (const full of cands) await scan(full);
