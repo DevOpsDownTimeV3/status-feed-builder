@@ -1,7 +1,7 @@
 const token = process.env.DASHBOARD_SYNC_TOKEN;
 
 const response = await fetch(
-  "https://api.github.com/repos/DevOpsDownTimeV3/changelog-generator/contents",
+  "https://api.github.com/repos/DevOpsDownTimeV3/changelog-generator",
   {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -12,11 +12,11 @@ const response = await fetch(
 
 const data = await response.json();
 
-console.log("CHANGELOG_CONTENTS:", JSON.stringify(
-  Array.isArray(data)
-    ? data.map(item => ({ name: item.name, type: item.type, path: item.path }))
-    : data
-));
+console.log("REPO_PERMISSIONS:", JSON.stringify({
+  status: response.status,
+  permissions: data.permissions,
+  message: data.message
+}));
 
 export async function render(context) {
   return JSON.stringify({
